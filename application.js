@@ -1,4 +1,6 @@
 $(document).ready(function(){
+  var selectedOption = "all";
+
   var getAndDisplayAllTasks = function () {
     $.ajax({
       type: 'GET',
@@ -6,7 +8,17 @@ $(document).ready(function(){
       dataType: 'json',
       success: function (response, textStatus) {
         $('#todo-list').empty();
-        response.tasks.forEach(function (task) {
+        response.tasks
+        .filter(function(task) {
+          if (selectedOption === 'all') {
+            return true;
+          } else if (selectedOption === 'complete') {
+            return task.completed === true;
+          } else if (selectedOption === 'active') {
+            return task.completed === false;
+          }
+        })
+        .forEach(function (task) {
           $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><button class="delete" data-id="' + task.id + '">Delete</button><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '>');
         });
       },
@@ -97,37 +109,17 @@ $(document).ready(function(){
 
   getAndDisplayAllTasks();
 
-    
-  $(document).ready(function(){
   var currentDate = new Date();
-var day = currentDate.getDate();
-var month = currentDate.getMonth() + 1;
-var year = currentDate.getFullYear();
+  var day = currentDate.getDate();
+  var month = currentDate.getMonth() + 1;
+  var year = currentDate.getFullYear();
 
-var currentTime = day + "/" + month + "/" + year;
+  var currentTime = day + "/" + month + "/" + year;
 
-$('#current-date').text(currentTime);
+  $('#current-date').text(currentTime);
 
-var getFilteredTasks = function() {
-  var filteredTasks = task.filter(function(task) {
-    return task.status === selectedOption;
-  });
-  return filteredTasks;
-};
-var taskFilter = $("#task-filler");
-$(document).ready(function(){
-    taskFilter.change(function() {
-      const selectedOption = $(this).val();
-
-      var filteredTasks = getFilteredTasks();
-
-      tasksList.empty();
-      filteredTasks.forEach(function(task) {
-        var taskItem = $("<li>");
-        taskItem.text(task.title);
-        tasksList.append(taskItem);
-      });
-    })
+  $("#task-filter").change(function() {
+    selectedOption = $(this).val();
+    getAndDisplayAllTasks();
+  })
 })
-});
-});
